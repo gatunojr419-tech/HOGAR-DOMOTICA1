@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Temperatura en Tiempo Real</title>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f0f0f0;
+            text-align: center;
+            padding: 20px;
+        }
+
+        #tempChart {
+            max-width: 700px;
+            margin: auto;
+            background: #ffffff;
+            padding: 15px;
+            border-radius: 10px;
+        }
+    </style>
+</head>
+<body>
+
+    <h2>Gráfico Estable de Temperatura</h2>
+    <canvas id="tempChart"></canvas>
+
+    <script>
+        const ctx = document.getElementById('tempChart').getContext('2d');
+        const maxPoints = 50; // ❗ Límite de puntos visibles
+
+        const tempChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: [],
+                datasets: [{
+                    label: 'Temperatura (°C)',
+                    data: [],
+                    borderColor: 'red',
+                    borderWidth: 2,
+                    tension: 0.3
+                }]
+            },
+            options: {
+                animation: false,          // Mejor rendimiento
+                responsive: true,
+                scales: {
+                    x: {
+                        title: { display: true, text: 'Tiempo' }
+                    },
+                    y: {
+                        suggestedMin: 0,
+                        suggestedMax: 50
+                    }
+                }
+            }
+        });
+
+        // 👉 Función estable que limita el crecimiento del gráfico
+        function addTemperature(temp) {
+            const now = new Date().toLocaleTimeString();
+
+            tempChart.data.labels.push(now);
+            tempChart.data.datasets[0].data.push(temp);
+
+            // ❗ Mantener solo los últimos 50 puntos
+            if (tempChart.data.labels.length > maxPoints) {
+                tempChart.data.labels.shift();
+                tempChart.data.datasets[0].data.shift();
+            }
+
+            tempChart.update();
+        }
+
+        // 🔥 Simulación de datos cada 1 segundo
+        setInterval(() => {
+            const tempSimulada = 20 + Math.random() * 10;
+            addTemperature(tempSimulada);
+        }, 1000);
+    </script>
+
+</body>
+</html>
